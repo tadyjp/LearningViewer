@@ -20,6 +20,9 @@ class MasterViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        println("arow.load()")
+        arow.load()
+        
         // Do any additional setup after loading the view, typically from a nib.
         //        self.navigationItem.leftBarButtonItem = self.editButtonItem()
         
@@ -71,7 +74,7 @@ class MasterViewController: UITableViewController {
         
         println("swipedTweet: \(swipedTweet)")
         
-        arow.update(FeatureVector(vector: swipedTweet.vector), label: swipePositive)
+        arow.update(swipedTweet.vector, label: swipePositive)
         
         arow.save()
     }
@@ -106,6 +109,12 @@ class MasterViewController: UITableViewController {
         
         let tweet = dataSource[indexPath.row] as Tweet
         cell.textLabel.text = tweet.text
+        
+        if tweet.positive {
+            cell.contentView.backgroundColor = UIColor(red: 1.0, green: 1.0, blue: 0.3, alpha: 0.5)
+        } else {
+            cell.contentView.backgroundColor = UIColor(red: 0.3, green: 1.0, blue: 1.0, alpha: 0.5)
+        }
         return cell
     }
     
@@ -124,6 +133,10 @@ class MasterViewController: UITableViewController {
             (dataSource: [Tweet]) in
             self.dataSource = dataSource
             println("self.dataSource: \(self.dataSource)")
+            
+            for tweet in self.dataSource {
+                tweet.positive = self.arow.predict(tweet.vector)
+            }
             
             if self.dataSource.count != 0 {
                 dispatch_async(dispatch_get_main_queue(), {

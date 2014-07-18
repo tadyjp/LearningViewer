@@ -43,7 +43,7 @@ struct FeatureVector: Printable {
 
 class Arow: Printable {
     
-    let r: Double
+    var r: Double
     var means: FeatureVector
     var covariance: FeatureVector
     
@@ -105,16 +105,29 @@ class Arow: Printable {
         ]
     }
 
-    func save() {
+    func archiveFilePath() -> String {
         let directory = NSHomeDirectory().stringByAppendingString("/Documents")
-        let filePath = directory.stringByAppendingPathComponent("data.dat")
-        println("filePath: \(filePath)")
-        
-        let saveSucceeded = NSKeyedArchiver.archiveRootObject(self.archiveData(), toFile: filePath)
+        return directory.stringByAppendingPathComponent("data.dat")
+    }
+    
+    func save() {
+        let saveSucceeded = NSKeyedArchiver.archiveRootObject(self.archiveData(), toFile: archiveFilePath())
         if saveSucceeded {
             println("Arow successfully saved.")
         } else {
             println("Arow NOT saved.")
+        }
+    }
+    
+    func load() {
+        let filemgr = NSFileManager.defaultManager()
+        
+        if filemgr.fileExistsAtPath(archiveFilePath()) {
+            let data: Dictionary<String, AnyObject> = NSKeyedUnarchiver.unarchiveObjectWithFile(archiveFilePath()) as Dictionary<String, AnyObject>
+            
+            self.means = FeatureVector(vector: data["means"]! as Dictionary<String, Double>, defaultValue: 0.0)
+            self.covariance = FeatureVector(vector: data["covariance"]! as Dictionary<String, Double>, defaultValue: 1.0)
+            self.r = data["r"]! as Double
         }
     }
     

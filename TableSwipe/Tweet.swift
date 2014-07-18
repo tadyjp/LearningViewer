@@ -14,8 +14,8 @@ class Tweet : Printable {
     var text: String
     var positive: Bool
     
-    var vector: Dictionary<String, Double> {
-    var dic: Dictionary<String, Double> = [:]
+    var vector: FeatureVector {
+    var dic = FeatureVector()
         for seg in self.segments() {
             dic[seg] = 1.0
         }
@@ -28,7 +28,7 @@ class Tweet : Printable {
     }
     
     var description: String {
-        return "Tweet<text:\"\(self.text)\">"
+        return "Tweet<positive:\(self.positive) , text:\"\(self.text)\">"
     }
     
     func segments() -> [String] {
